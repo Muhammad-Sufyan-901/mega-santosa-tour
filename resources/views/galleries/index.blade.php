@@ -57,10 +57,10 @@
                         <div
                             class="absolute inset-0 bg-black/15 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end">
                             <div
-                                class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                <h3 class="text-sm font-semibold">{{ $image->title ?? 'Gallery Image' }}</h3>
-                                @if ($image->description)
-                                    <p class="text-xs opacity-90 mt-1">{{ Str::limit($image->description, 50) }}</p>
+                                class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-black/45 w-full">
+                                <h3 class="text-base font-semibold">{{ $image->title ?? 'Gallery Image' }}</h3>
+                                @if ($image->prolog)
+                                    <p class="text-xs opacity-90 mt-1">{{ Str::limit($image->prolog, 50) }}</p>
                                 @endif
                             </div>
                         </div>

@@ -112,46 +112,77 @@
                 </div>
             </div>
         </div> --}}
-        <iframe width="1024" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
-            id="gmap_canvas" class="w-full" src="{{ $contactData['map_embed'] }}"></iframe>
-        <a href='https://www.acadoo.de/'>acadoo</a>
-        <script type='text/javascript'
-            src='https://embedmaps.com/google-maps-authorization/script.js?id=7850590ffac6543edf0a6aa6cd6c97813ed6bd00'>
-        </script>
+        <!-- Location Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Lokasi Kami</h2>
+            <p class="text-gray-600 mb-6">{{ $contactData['address'] ?? 'Jl. Alamat Kantor Pusat' }}</p>
+
+            <!-- Map Container -->
+            <iframe width="1024" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+                id="gmap_canvas" class="w-full rounded-lg" src="{{ $contactData['map_embed'] }}"></iframe>
+        </div>
 
         <!-- Contact Form -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Kirim Pesan</h2>
-            <form class="space-y-6">
+
+            <!-- Success Message -->
+            @if (session('success'))
+                <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
+
+            <!-- Error Message -->
+            @if (session('error'))
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
+
+            <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
+                @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Nama Lengkap</label>
-                        <input type="text" id="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        <input type="text" id="name" name="name" value="{{ old('name') }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('name') border-red-500 @enderror"
                             placeholder="Masukkan nama lengkap" required>
+                        @error('name')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                        <input type="email" id="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        <input type="email" id="email" name="email" value="{{ old('email') }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('email') border-red-500 @enderror"
                             placeholder="nama@contoh.com" required>
+                        @error('email')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 <div>
                     <label for="subject" class="block mb-2 text-sm font-medium text-gray-900">Subjek</label>
-                    <input type="text" id="subject"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    <input type="text" id="subject" name="subject" value="{{ old('subject') }}"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('subject') border-red-500 @enderror"
                         placeholder="Subjek pesan" required>
+                    @error('subject')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div>
                     <label for="message" class="block mb-2 text-sm font-medium text-gray-900">Pesan</label>
-                    <textarea id="message" rows="4"
-                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Tulis pesan Anda di sini..." required></textarea>
+                    <textarea id="message" name="message" rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('message') border-red-500 @enderror"
+                        placeholder="Tulis pesan Anda di sini..." required>{{ old('message') }}</textarea>
+                    @error('message')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <button type="submit"
                     class="w-full md:w-auto text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                    Kirim Pesan
+                    <i class="fas fa-paper-plane mr-2"></i> Kirim Pesan
                 </button>
             </form>
         </div>
@@ -181,12 +212,7 @@
                     });
                 });
 
-                // Handle form submission
-                document.querySelector('form').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('Pesan berhasil dikirim! Kami akan menghubungi Anda segera.');
-                    this.reset();
-                });
+                // Form submission is now handled by server-side processing
             });
         </script>
     </section>

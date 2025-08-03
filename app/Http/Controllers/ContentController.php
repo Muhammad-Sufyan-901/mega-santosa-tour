@@ -211,9 +211,10 @@ class ContentController extends Controller
             'contact_section_title' => 'required|string|max:255',
             'contact_section_description' => 'nullable|string',
             'whatsapp' => 'nullable|string|max:255',
-            'instagram' => 'nullable|url|max:255',
+            'instagram' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
-            'google_maps' => 'nullable|url'
+            'google_maps' => 'nullable|url',
+            'address' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -231,6 +232,8 @@ class ContentController extends Controller
             $content->instagram = $request->instagram;
             $content->email = $request->email;
             $content->google_maps = $request->google_maps;
+            $content->address = $request->address;
+
             $content->save();
 
             return redirect()->back()->with('success', 'Konten Contact berhasil diperbarui!');

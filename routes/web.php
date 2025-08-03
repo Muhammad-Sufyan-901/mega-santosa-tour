@@ -28,6 +28,7 @@ Route::get('/services/{id}/detail', [LandingPageController::class, 'serviceDetai
 Route::get('/galleries', [LandingPageController::class, 'galleriesIndex'])->name('galleries.index');
 
 Route::get('/contact', [LandingPageController::class, 'contactIndex'])->name('contact.index');
+Route::post('/contact', [LandingPageController::class, 'submitContactFormWeb'])->name('contact.submit');
 
 // Public API routes for testimonials and orders
 Route::prefix('api/public')->name('api.public.')->group(function () {

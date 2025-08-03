@@ -474,12 +474,12 @@
                             <div>
                                 <label for="instagram"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Instagram
+                                    Instagram (Username)
                                 </label>
-                                <input type="url" name="instagram" id="instagram"
+                                <input type="text" name="instagram" id="instagram"
                                     value="{{ old('instagram', $content->instagram ?? '') }}"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                    placeholder="https://instagram.com/username">
+                                    placeholder="username">
                             </div>
 
                             <!-- Email -->
@@ -504,6 +504,17 @@
                                     value="{{ old('google_maps', $content->google_maps ?? '') }}"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                     placeholder="https://www.google.com/maps/embed?pb=...">
+                            </div>
+
+                            <!-- Contact Section Description -->
+                            <div class="md:col-span-2">
+                                <label for="contact_section_description"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Alamat
+                                </label>
+                                <textarea name="address" id="address" rows="4"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    placeholder="Masukkan alamat">{{ old('address', $content->address ?? '') }}</textarea>
                             </div>
 
                             <!-- Contact Section Description -->

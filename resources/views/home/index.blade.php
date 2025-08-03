@@ -400,10 +400,10 @@
                         <div
                             class="absolute inset-0 bg-black/15 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end">
                             <div
-                                class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                <h3 class="text-sm font-semibold">{{ $image->title ?? 'Gallery Image' }}</h3>
-                                @if ($image->description)
-                                    <p class="text-xs opacity-90 mt-1">{{ Str::limit($image->description, 50) }}</p>
+                                class="p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-black/45 w-full">
+                                <h3 class="text-base font-semibold">{{ $image->title ?? 'Gallery Image' }}</h3>
+                                @if ($image->prolog)
+                                    <p class="text-xs opacity-90 mt-1">{{ Str::limit($image->prolog, 50) }}</p>
                                 @endif
                             </div>
                         </div>
@@ -527,34 +527,61 @@
         <!-- Contact Form -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Kirim Pesan</h2>
-            <form id="contact-form" class="space-y-6">
+
+            <!-- Success Message -->
+            @if (session('success'))
+                <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
+
+            <!-- Error Message -->
+            @if (session('error'))
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
+
+            <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900">Nama
                             Lengkap</label>
-                        <input type="text" id="contact-name" name="name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        <input type="text" id="contact-name" name="name" value="{{ old('name') }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('name') border-red-500 @enderror"
                             placeholder="Masukkan nama lengkap" required>
+                        @error('name')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label for="contact-email" class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                        <input type="email" id="contact-email" name="email"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        <input type="email" id="contact-email" name="email" value="{{ old('email') }}"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('email') border-red-500 @enderror"
                             placeholder="nama@contoh.com" required>
+                        @error('email')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 <div>
                     <label for="contact-subject" class="block mb-2 text-sm font-medium text-gray-900">Subjek</label>
-                    <input type="text" id="contact-subject" name="subject"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    <input type="text" id="contact-subject" name="subject" value="{{ old('subject') }}"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 @error('subject') border-red-500 @enderror"
                         placeholder="Subjek pesan" required>
+                    @error('subject')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div>
                     <label for="contact-message" class="block mb-2 text-sm font-medium text-gray-900">Pesan</label>
                     <textarea id="contact-message" name="message" rows="4"
-                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Tulis pesan Anda di sini..." required></textarea>
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('message') border-red-500 @enderror"
+                        placeholder="Tulis pesan Anda di sini..." required>{{ old('message') }}</textarea>
+                    @error('message')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <button type="submit"
                     class="w-full md:w-auto text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">

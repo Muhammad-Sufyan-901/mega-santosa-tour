@@ -334,6 +334,7 @@ class LandingPageController extends Controller
                 'instagram' => $contentRow->instagram ?? '@megasantosatour',
                 'email' => $contentRow->email ?? 'info@megasantosatour.com',
                 'google_maps' => $contentRow->google_maps ?? 'https://maps.google.com/maps?width=1024&amp;height=400&amp;hl=en&amp;q=Jalan%20Gunung%20Andakasa%20+(Mega%20Santosa%20Tour)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed',
+                'address' => $contentRow->address ?? 'Jl. Alamat Kantor Pusat',
                 'logo' => $contentRow->logo ?? null,
                 'favicon' => $contentRow->favicon ?? null,
             ];
@@ -379,8 +380,8 @@ class LandingPageController extends Controller
             'whatsapp' => $content['whatsapp'] ?? '+62 812-3456-7890',
             'instagram' => $content['instagram'] ?? '@megasantosatour',
             'email' => $content['email'] ?? 'info@megasantosatour.com',
-            'address' => 'Jl. Alamat Kantor Pusat',
-            'map_embed' => $content['google_maps'] ?? 'https://maps.google.com/maps?width=1024&amp;height=400&amp;hl=en&amp;q=Jalan%20Gunung%20Andakasa%20+(Mega%20Santosa%20Tour)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed',
+            'address' => $content['address'] ?? 'Jl. Alamat Kantor Pusat',
+            'map_embed' => html_entity_decode($content['google_maps'] ?? 'https://maps.google.com/maps?width=1024&amp;height=400&amp;hl=en&amp;q=Jalan%20Gunung%20Andakasa%20+(Mega%20Santosa%20Tour)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed'),
         ];
     }
 
@@ -637,7 +638,7 @@ class LandingPageController extends Controller
     }
 
     /**
-     * Submit contact form
+     * Submit contact form via AJAX/API
      */
     public function submitContactForm(Request $request)
     {
@@ -661,6 +662,53 @@ class LandingPageController extends Controller
                 'success' => false,
                 'message' => 'Error sending message: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Submit contact form via regular form submission
+     */
+    public function submitContactFormWeb(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string|max:1000',
+            ], [
+                'name.required' => 'Nama wajib diisi.',
+                'name.max' => 'Nama maksimal 255 karakter.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.max' => 'Email maksimal 255 karakter.',
+                'subject.required' => 'Subjek wajib diisi.',
+                'subject.max' => 'Subjek maksimal 255 karakter.',
+                'message.required' => 'Pesan wajib diisi.',
+                'message.max' => 'Pesan maksimal 1000 karakter.',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()
+                    ->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            // Send contact form email to admin
+            $this->sendContactFormToAdmin($request->all());
+
+            return redirect()
+                ->back()
+                ->with('success', 'Pesan berhasil dikirim! Kami akan menghubungi Anda segera.')
+                ->withInput(['name' => '', 'email' => '', 'subject' => '', 'message' => '']);
+        } catch (\Exception $e) {
+            Log::error('Contact form submission error: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.')
+                ->withInput();
         }
     }
 
