@@ -17,7 +17,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Order::with('service');
+        $query = Order::with(['service', 'variant']);
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -284,7 +284,7 @@ class OrderController extends Controller
     public function getOrderAJAX($id)
     {
         try {
-            $order = Order::with('service')->findOrFail($id);
+            $order = Order::with(['service', 'variant'])->findOrFail($id);
 
             // Format data for frontend
             $orderData = [
@@ -306,13 +306,20 @@ class OrderController extends Controller
                     'title' => $order->service->title,
                     'price' => $order->service->price,
                 ] : null,
+                'variant' => $order->variant ? [
+                    'id' => $order->variant->id,
+                    'name' => $order->variant->name,
+                    'price' => $order->variant->price,
+                ] : null,
                 // Computed fields
                 'formatted_start_date' => $order->start_date ? Carbon::parse($order->start_date)->format('d M Y') : '',
                 'formatted_end_date' => $order->end_date ? Carbon::parse($order->end_date)->format('d M Y') : '',
                 'duration' => $this->calculateDuration($order->start_date, $order->end_date),
                 'status_text' => $this->getStatusText($order->status),
                 'clean_whatsapp_number' => $this->formatWhatsAppNumber($order->whatsapp_number),
-                'total_price' => $order->service ? ($order->service->price * $this->calculateDuration($order->start_date, $order->end_date) * $order->number_of_participants) : 0
+                'display_title' => $order->variant ? ($order->service->title . ' | ' . $order->variant->name) : ($order->service ? $order->service->title : 'Layanan Tidak Ditemukan'),
+                'display_price' => $order->variant ? $order->variant->price : ($order->service ? $order->service->price : 0),
+                'total_price' => $this->calculateTotalPrice($order)
             ];
 
             return response()->json([
@@ -326,6 +333,25 @@ class OrderController extends Controller
                 'message' => 'Pesanan tidak ditemukan.'
             ], 404);
         }
+    }
+
+    /**
+     * Calculate total price for order considering variant
+     */
+    private function calculateTotalPrice($order)
+    {
+        $basePrice = 0;
+        
+        // Use variant price if available, otherwise use service price
+        if ($order->variant) {
+            $basePrice = $order->variant->price;
+        } elseif ($order->service) {
+            $basePrice = $order->service->price;
+        }
+        
+        $duration = $this->calculateDuration($order->start_date, $order->end_date);
+        
+        return $basePrice * $duration * $order->number_of_participants;
     }
 
     /**

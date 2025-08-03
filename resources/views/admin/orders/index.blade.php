@@ -130,7 +130,12 @@
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
                                             <div class="text-base font-semibold text-gray-900 dark:text-white">
-                                                {{ $order->service->title ?? 'Layanan Tidak Ditemukan' }}</div>
+                                                @if ($order->variant)
+                                                    {{ $order->service->title ?? 'Layanan Tidak Ditemukan' }} | {{ $order->variant->name }}
+                                                @else
+                                                    {{ $order->service->title ?? 'Layanan Tidak Ditemukan' }}
+                                                @endif
+                                            </div>
                                             <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
                                                 {{ $order->number_of_participants }} Peserta</div>
                                         </div>
@@ -144,10 +149,19 @@
                                         </div>
                                     </td>
                                     <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        @if ($order->service)
+                                        @php
+                                            $basePrice = 0;
+                                            if ($order->variant) {
+                                                $basePrice = $order->variant->price;
+                                            } elseif ($order->service) {
+                                                $basePrice = $order->service->price;
+                                            }
+                                            $totalPrice = $basePrice * $order->duration * $order->number_of_participants;
+                                        @endphp
+                                        
+                                        @if ($basePrice > 0)
                                             <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                                                Rp
-                                                {{ number_format($order->service->price * $order->duration * $order->number_of_participants, 0, ',', '.') }}
+                                                Rp {{ number_format($totalPrice, 0, ',', '.') }}
                                             </div>
                                         @else
                                             <div class="text-sm text-gray-500 dark:text-gray-400">-</div>
@@ -356,7 +370,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Jenis Layanan</p>
-                                <p class="text-base font-semibold text-gray-900 dark:text-white">${order.service ? order.service.title : 'Layanan Tidak Ditemukan'}</p>
+                                <p class="text-base font-semibold text-gray-900 dark:text-white">${order.display_title || 'Layanan Tidak Ditemukan'}</p>
+                                ${order.variant ? '<p class="text-xs text-gray-400 dark:text-gray-500">Varian: ' + order.variant.name + '</p>' : ''}
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Lokasi Pickup</p>
@@ -388,7 +403,8 @@
                             <p class="text-lg font-bold text-gray-900 dark:text-white">Total Harga</p>
                             <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">Rp ${formatNumber(order.total_price)}</p>
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${order.duration} hari × Rp ${order.service ? formatNumber(order.service.price) : '0'} × ${order.number_of_participants} peserta</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${order.duration} hari × Rp ${formatNumber(order.display_price || 0)} × ${order.number_of_participants} peserta</p>
+                        ${order.variant ? '<p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Menggunakan harga varian: ' + order.variant.name + '</p>' : ''}
                     </div>
 
                     <!-- Status Update Section -->
