@@ -95,11 +95,11 @@
                                     class="flex-1 inline-flex justify-center items-center px-3 py-4 text-sm font-medium text-center text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full">
                                     Lihat Detail
                                 </a>
-                                <button
+                                {{-- <button
                                     onclick="openBookingModal({{ $service->id }}, '{{ $service->title }}', {{ $service->price }})"
                                     class="px-4 py-4 text-sm font-medium text-center cursor-pointer text-[#1B5DB9] bg-white border border-[#1B5DB9] hover:bg-[#1B5DB9] hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full">
                                     <i class="fas fa-calendar-plus"></i>
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
                     </div>
@@ -165,11 +165,11 @@
                                     class="flex-1 inline-flex justify-center items-center px-3 py-4 text-sm font-medium text-center text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full">
                                     Lihat Detail
                                 </a>
-                                <button
+                                {{-- <button
                                     onclick="openBookingModal({{ $service->id }}, '{{ $service->title }}', {{ $service->price }})"
                                     class="px-4 py-4 text-sm font-medium text-center text-[#1B5DB9] bg-white border border-[#1B5DB9] hover:bg-[#1B5DB9] cursor-pointer hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-full">
                                     <i class="fas fa-calendar-plus"></i>
-                                </button>
+                                </button> --}}
                             </div>
                         </div>
                     </div>
