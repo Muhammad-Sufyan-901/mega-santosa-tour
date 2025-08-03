@@ -323,9 +323,12 @@
                                         role="menuitem">Profile</a>
                                 </li>
                                 <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 text-sm bg-red-500 mx-2 mb-2 rounded-lg text-white hover:bg-red-800"
-                                        role="menuitem">Logout</a>
+                                    <form action="{{ route('auth.logout') }}" method="POST" class="mx-2 mb-2">
+                                        @csrf
+                                        <button type="submit"
+                                            class="block w-full px-4 py-2 text-sm bg-red-500 rounded-lg text-white hover:bg-red-800 text-left"
+                                            role="menuitem">Logout</button>
+                                    </form>
                                 </li>
                             </ul>
                         </div>

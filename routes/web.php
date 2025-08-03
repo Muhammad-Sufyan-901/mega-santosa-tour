@@ -8,6 +8,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AuthController;
 
 // Public Routes
 Route::get('/', [LandingPageController::class, 'index'])->name('home.index');
@@ -36,18 +37,17 @@ Route::prefix('api/public')->name('api.public.')->group(function () {
 
 // Auth Routes
 Route::prefix('auth')->name('auth.')->group(function () {
-    Route::get('/login', function () {
-        $viewData = [
-            'title' => 'Login',
-        ];
-
-        return view('auth.login', $viewData);
-    })->name('login');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    // Route to create default admin (for development/setup)
+    Route::get('/create-admin', [AuthController::class, 'createDefaultAdmin'])->name('create.admin');
 });
 
 
 // Admin Routes Group
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     // Dashboard - Updated to use DashboardController
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
