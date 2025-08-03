@@ -462,6 +462,7 @@ class LandingPageController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'service_id' => 'required|exists:services,id',
+                'variant_id' => 'nullable|exists:service_variants,id',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'whatsapp_number' => 'required|string|max:20',
@@ -483,6 +484,7 @@ class LandingPageController extends Controller
             // Create new order
             $order = Order::create([
                 'service_id' => $request->service_id,
+                'service_variant_id' => $request->variant_id,
                 'name' => $request->name,
                 'email' => $request->email,
                 'whatsapp_number' => $request->whatsapp_number,
@@ -494,8 +496,8 @@ class LandingPageController extends Controller
                 'status' => 'pending',
             ]);
 
-            // Load service relationship
-            $order->load('service');
+            // Load service and variant relationships
+            $order->load(['service', 'variant']);
 
             // Note: Email notification disabled as requested
             // $this->sendOrderNotificationToAdmin($order);

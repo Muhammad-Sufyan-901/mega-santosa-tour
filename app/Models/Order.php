@@ -12,6 +12,7 @@ class Order extends Model
 
     protected $fillable = [
         'service_id',
+        'service_variant_id',
         'name',
         'email',
         'whatsapp_number',
@@ -41,6 +42,14 @@ class Order extends Model
     public function service()
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Relationship with ServiceVariant
+     */
+    public function variant()
+    {
+        return $this->belongsTo(ServiceVariant::class, 'service_variant_id');
     }
 
     /**

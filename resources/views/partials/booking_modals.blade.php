@@ -71,21 +71,59 @@
                                 required>
                                 <option value="" disabled selected>Pilih jenis layanan</option>
                                 @php
-                                    $services = \App\Models\Service::where('status', 'active')->get();
+                                    $services = \App\Models\Service::with('variants')->where('status', 'active')->get();
                                 @endphp
                                 <optgroup label="Sewa Mobil">
                                     @foreach ($services->where('type_of_service', 'Sewa Mobil') as $service)
+                                        @if ($service->variants->count() > 0)
+                                            {{-- Service with variants --}}
+                                <optgroup label="&nbsp;&nbsp;{{ $service->title }}">
+                                    @foreach ($service->variants as $variant)
                                         <option value="{{ $service->id }}" data-type="car"
-                                            data-price="{{ $service->price }}">{{ $service->title }} - Rp
-                                            {{ number_format($service->price, 0, ',', '.') }}/hari</option>
+                                            data-price="{{ $variant->price }}" data-variant-id="{{ $variant->id }}"
+                                            data-variant-name="{{ $variant->name }}"
+                                            data-service-title="{{ $service->title }}"
+                                            data-display-text="{{ $service->title }} | {{ $variant->name }} - Rp {{ number_format($variant->price, 0, ',', '.') }}/hari">
+                                            &nbsp;&nbsp;&nbsp;&nbsp;{{ $service->title }} | {{ $variant->name }} - Rp
+                                            {{ number_format($variant->price, 0, ',', '.') }}/hari
+                                        </option>
                                     @endforeach
+                                </optgroup>
+                            @else
+                                {{-- Service without variants --}}
+                                <option value="{{ $service->id }}" data-type="car" data-price="{{ $service->price }}"
+                                    data-service-title="{{ $service->title }}"
+                                    data-display-text="{{ $service->title }} - Rp {{ number_format($service->price, 0, ',', '.') }}/hari">
+                                    {{ $service->title }} - Rp {{ number_format($service->price, 0, ',', '.') }}/hari
+                                </option>
+                                @endif
+                                @endforeach
                                 </optgroup>
                                 <optgroup label="Paket Tour">
                                     @foreach ($services->where('type_of_service', 'Paket Tour') as $service)
+                                        @if ($service->variants->count() > 0)
+                                            {{-- Service with variants --}}
+                                <optgroup label="&nbsp;&nbsp;{{ $service->title }}">
+                                    @foreach ($service->variants as $variant)
                                         <option value="{{ $service->id }}" data-type="tour"
-                                            data-price="{{ $service->price }}">{{ $service->title }} - Rp
-                                            {{ number_format($service->price, 0, ',', '.') }}/hari</option>
+                                            data-price="{{ $variant->price }}" data-variant-id="{{ $variant->id }}"
+                                            data-variant-name="{{ $variant->name }}"
+                                            data-service-title="{{ $service->title }}"
+                                            data-display-text="{{ $service->title }} | {{ $variant->name }} - Rp {{ number_format($variant->price, 0, ',', '.') }}/hari">
+                                            &nbsp;&nbsp;&nbsp;&nbsp;{{ $service->title }} | {{ $variant->name }} - Rp
+                                            {{ number_format($variant->price, 0, ',', '.') }}/hari
+                                        </option>
                                     @endforeach
+                                </optgroup>
+                            @else
+                                {{-- Service without variants --}}
+                                <option value="{{ $service->id }}" data-type="tour"
+                                    data-price="{{ $service->price }}" data-service-title="{{ $service->title }}"
+                                    data-display-text="{{ $service->title }} - Rp {{ number_format($service->price, 0, ',', '.') }}/hari">
+                                    {{ $service->title }} - Rp {{ number_format($service->price, 0, ',', '.') }}/hari
+                                </option>
+                                @endif
+                                @endforeach
                                 </optgroup>
                             </select>
                         </div>
@@ -292,10 +330,23 @@
                 // Get form data
                 const formData = new FormData(bookingForm);
                 const serviceTypeSelect = document.getElementById('service-type');
-                const selectedServiceId = serviceTypeSelect.value || formData.get('service-id') || getServiceIdFromPage();
-                
+
+                // Validate service selection
+                if (!serviceTypeSelect || !serviceTypeSelect.value) {
+                    alert('Mohon pilih jenis layanan terlebih dahulu.');
+                    return;
+                }
+
+                const selectedServiceId = serviceTypeSelect.value || formData.get('service-id') ||
+                    getServiceIdFromPage();
+
+                // Get variant data if selected
+                const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
+                const variantId = selectedOption?.dataset?.variantId || null;
+
                 const bookingData = {
                     service_id: selectedServiceId,
+                    variant_id: variantId,
                     name: formData.get('full-name'),
                     email: formData.get('email'),
                     whatsapp_number: formData.get('whatsapp'),
@@ -320,9 +371,14 @@
                 const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
 
                 // Get base price from selected service
-                const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
                 const basePrice = parseInt(selectedOption?.dataset?.price) || 1000000;
-                const serviceName = selectedOption?.textContent || 'Layanan';
+
+                // Get service name from display text or construct it
+                const serviceName = selectedOption?.dataset?.displayText ||
+                    (selectedOption?.dataset?.variantName ?
+                        `${selectedOption.dataset.serviceTitle} | ${selectedOption.dataset.variantName}` :
+                        (selectedOption?.dataset?.serviceTitle || selectedOption?.textContent ||
+                            'Layanan'));
 
                 // Calculate total price (base price * days * participants)
                 const totalPrice = basePrice * days * parseInt(bookingData.number_of_participants);
@@ -389,8 +445,12 @@
                         },
                         body: JSON.stringify(bookingData)
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Response data:', data);
                         if (data.success) {
                             // Hide confirmation modal and show success modal
                             hideModal('confirmation-modal');
@@ -440,16 +500,18 @@
         // Pre-select service type if coming from detail page or if service ID is provided
         function preSelectService() {
             if (!serviceTypeSelect) return;
-            
-            // Try to get service ID from various sources
+
+            // Try to get service ID and variant ID from various sources
             let serviceId = null;
-            
+            let variantId = null;
+
             // 1. From button data attribute
             const bookingButton = document.querySelector('[data-modal-target="booking-modal"]');
             if (bookingButton && bookingButton.dataset.serviceId) {
                 serviceId = bookingButton.dataset.serviceId;
+                variantId = bookingButton.dataset.variantId || null;
             }
-            
+
             // 2. From URL if on detail page
             if (!serviceId && window.location.pathname.includes('/detail')) {
                 const pathParts = window.location.pathname.split('/');
@@ -457,32 +519,53 @@
                 if (serviceIndex !== -1 && pathParts[serviceIndex + 1]) {
                     serviceId = pathParts[serviceIndex + 1];
                 }
+
+                // Get variant ID from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                variantId = urlParams.get('variant_id');
             }
-            
+
             // 3. Try to match by service name from page title
             if (!serviceId && window.location.pathname.includes('/detail')) {
                 const serviceName = document.querySelector('h1.text-5xl')?.textContent.trim();
                 if (serviceName) {
                     for (let i = 0; i < serviceTypeSelect.options.length; i++) {
-                        if (serviceTypeSelect.options[i].textContent.includes(serviceName)) {
+                        const option = serviceTypeSelect.options[i];
+                        // Check if variant name matches or service title matches
+                        if (option.dataset.variantName === serviceName ||
+                            option.dataset.serviceTitle === serviceName ||
+                            option.textContent.includes(serviceName)) {
                             serviceTypeSelect.selectedIndex = i;
                             return;
                         }
                     }
                 }
             }
-            
-            // Select by service ID
+
+            // Select by service ID and variant ID
             if (serviceId) {
                 for (let i = 0; i < serviceTypeSelect.options.length; i++) {
-                    if (serviceTypeSelect.options[i].value === serviceId) {
-                        serviceTypeSelect.selectedIndex = i;
-                        break;
+                    const option = serviceTypeSelect.options[i];
+                    if (option.value === serviceId) {
+                        // If variant ID is specified, match exact variant
+                        if (variantId && option.dataset.variantId === variantId) {
+                            serviceTypeSelect.selectedIndex = i;
+                            break;
+                        }
+                        // If no variant ID or this option doesn't have variant, select if first match
+                        else if (!variantId && !option.dataset.variantId) {
+                            serviceTypeSelect.selectedIndex = i;
+                            break;
+                        }
+                        // If no exact variant match found, select first variant of the service
+                        else if (variantId && !serviceTypeSelect.value) {
+                            serviceTypeSelect.selectedIndex = i;
+                        }
                     }
                 }
             }
         }
-        
+
         // Call pre-select function
         preSelectService();
 
