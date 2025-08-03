@@ -167,11 +167,29 @@ class LandingPageController extends Controller
         }
     }
 
-    public function serviceDetail($id)
+    public function serviceDetail($id, Request $request)
     {
         $service = Service::with(['includes', 'excludes', 'requirements', 'images', 'variants'])
             ->where('status', 'active')
             ->findOrFail($id);
+
+        // Get variant ID from request parameter if provided
+        $variantId = $request->get('variant_id');
+        $selectedVariant = null;
+
+        // If variant ID is provided, find the specific variant
+        if ($variantId && $service->variants->count() > 0) {
+            $selectedVariant = $service->variants->find($variantId);
+        }
+
+        // If no specific variant selected, use the first variant if available
+        if (!$selectedVariant && $service->variants->count() > 0) {
+            $selectedVariant = $service->variants->first();
+        }
+
+        // Determine display title and price
+        $displayTitle = $selectedVariant ? $selectedVariant->name : $service->title;
+        $displayPrice = $selectedVariant ? $selectedVariant->price : $service->price;
 
         // Get other services for recommendations (exclude current service)
         $otherServices = Service::with(['images'])
@@ -182,10 +200,13 @@ class LandingPageController extends Controller
             ->get();
 
         $viewData = [
-            'title' => 'Detail ' . $service->title,
+            'title' => 'Detail ' . $displayTitle,
             'sectionTitle' => 'Detail Layanan',
             'activePage' => 'Layanan',
             'service' => $service,
+            'selectedVariant' => $selectedVariant,
+            'displayTitle' => $displayTitle,
+            'displayPrice' => $displayPrice,
             'otherServices' => $otherServices,
         ];
 

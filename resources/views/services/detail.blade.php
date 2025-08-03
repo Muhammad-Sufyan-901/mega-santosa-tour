@@ -62,8 +62,28 @@
         </div>
 
         <div class="mt-10">
-            <h1 class="text-5xl font-black text-[#1B5DB9]">{{ $service->title }}</h1>
-            <h3 class="text-3xl font-bold text-gray-900 mt-4">Rp {{ number_format($service->price, 0, ',', '.') }}</h3>
+            <!-- Variant Tabs (only show if service has variants) -->
+            @if ($service->variants->count() > 0)
+                <div class="mb-6">
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            @foreach ($service->variants as $index => $variant)
+                                <button type="button" 
+                                    class="variant-tab whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm {{ $selectedVariant && $selectedVariant->id === $variant->id ? 'border-[#1B5DB9] text-[#1B5DB9]' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
+                                    data-variant-id="{{ $variant->id }}"
+                                    data-variant-name="{{ $variant->name }}"
+                                    data-variant-price="{{ $variant->price }}">
+                                    {{ $variant->name }}
+                                </button>
+                            @endforeach
+                        </nav>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Dynamic Title and Price -->
+            <h1 id="service-title" class="text-5xl font-black text-[#1B5DB9]">{{ $displayTitle }}</h1>
+            <h3 id="service-price" class="text-3xl font-bold text-gray-900 mt-4">Rp {{ number_format($displayPrice, 0, ',', '.') }}</h3>
 
             {{-- Rating section (hidden as requested)
             <div class="mt-5 flex items-center gap-x-3">
@@ -139,9 +159,11 @@
             </div>
 
             <button data-modal-target="booking-modal" data-modal-toggle="booking-modal" type="button"
+                id="booking-button"
                 class="mt-6 text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm px-6 py-3 text-center inline-flex items-center justify-center cursor-pointer"
                 data-service-id="{{ $service->id }}" data-service-type="service"
-                data-service-name="{{ $service->title }}">
+                data-service-name="{{ $displayTitle }}"
+                @if($selectedVariant) data-variant-id="{{ $selectedVariant->id }}" @endif>
                 <i class="fa-brands fa-whatsapp mr-2 text-lg"></i> Pesan Sekarang
             </button>
         </div>
@@ -376,6 +398,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Image gallery functionality
             const mainImage = document.getElementById('mainImage');
             const thumbnails = document.querySelectorAll('.thumbnail-img');
 
@@ -399,6 +422,69 @@
                     this.classList.add('border-blue-500');
                 });
             });
+
+            // Variant tabs functionality
+            const variantTabs = document.querySelectorAll('.variant-tab');
+            const serviceTitle = document.getElementById('service-title');
+            const servicePrice = document.getElementById('service-price');
+            const bookingButton = document.getElementById('booking-button');
+
+            variantTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active state from all tabs
+                    variantTabs.forEach(t => {
+                        t.classList.remove('border-[#1B5DB9]', 'text-[#1B5DB9]');
+                        t.classList.add('border-transparent', 'text-gray-500');
+                    });
+
+                    // Add active state to clicked tab
+                    this.classList.remove('border-transparent', 'text-gray-500');
+                    this.classList.add('border-[#1B5DB9]', 'text-[#1B5DB9]');
+
+                    // Get variant data
+                    const variantId = this.getAttribute('data-variant-id');
+                    const variantName = this.getAttribute('data-variant-name');
+                    const variantPrice = this.getAttribute('data-variant-price');
+
+                    // Update title and price
+                    serviceTitle.textContent = variantName;
+                    servicePrice.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(variantPrice);
+
+                    // Update booking button attributes
+                    bookingButton.setAttribute('data-service-name', variantName);
+                    bookingButton.setAttribute('data-variant-id', variantId);
+
+                    // Update URL with variant parameter (optional, for sharing)
+                    const currentUrl = new URL(window.location);
+                    currentUrl.searchParams.set('variant_id', variantId);
+                    window.history.replaceState({}, '', currentUrl);
+                });
+            });
+
+            // Handle fallback to service data when no variant is available
+            const serviceData = {
+                title: '{{ $service->title }}',
+                price: {{ $service->price }},
+                id: {{ $service->id }}
+            };
+
+            // Function to reset to service data
+            function resetToServiceData() {
+                serviceTitle.textContent = serviceData.title;
+                servicePrice.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(serviceData.price);
+                bookingButton.setAttribute('data-service-name', serviceData.title);
+                bookingButton.removeAttribute('data-variant-id');
+                
+                // Remove variant parameter from URL
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.delete('variant_id');
+                window.history.replaceState({}, '', currentUrl);
+            }
+
+            // If no variants exist or no variant is selected, ensure proper fallback
+            @if($service->variants->count() === 0)
+                resetToServiceData();
+            @endif
         });
     </script>
 @endsection
