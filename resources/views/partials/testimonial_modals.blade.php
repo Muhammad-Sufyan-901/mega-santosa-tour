@@ -156,6 +156,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Prevent multiple event listener registration
+        if (window.testimonialModalInitialized) {
+            return;
+        }
+        window.testimonialModalInitialized = true;
         // Get form elements
         const testimonialForm = document.getElementById('testimonial-form');
         const ratingInputs = document.querySelectorAll('input[name="rating"]');
@@ -231,21 +236,45 @@
                     return;
                 }
 
-                // Here you would typically send the data to your server
-                // For now, we'll just show the success modal
-                console.log('Testimonial Data:', testimonialData);
+                // Prevent multiple submissions
+                if (window.testimonialSubmitting) {
+                    return;
+                }
+                window.testimonialSubmitting = true;
 
-                // Simulate API call
-                setTimeout(() => {
-                    // Hide testimonial modal and show success modal
-                    hideModal('testimonial-modal');
-                    showModal('testimonial-success-modal');
+                // Submit testimonial to API
+                fetch('/api/public/testimonials', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify(testimonialData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Hide testimonial modal and show success modal
+                            hideModal('testimonial-modal');
+                            showModal('testimonial-success-modal');
 
-                    // Reset form
-                    testimonialForm.reset();
-                    currentRating = 0;
-                    updateRatingDisplay();
-                }, 500);
+                            // Reset form
+                            testimonialForm.reset();
+                            currentRating = 0;
+                            updateRatingDisplay();
+                        } else {
+                            throw new Error(data.message || 'Terjadi kesalahan saat mengirim testimoni.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan: ' + error.message);
+                    })
+                    .finally(() => {
+                        // Reset submission flag
+                        window.testimonialSubmitting = false;
+                    });
             });
         }
 

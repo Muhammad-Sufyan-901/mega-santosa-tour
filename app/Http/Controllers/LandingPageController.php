@@ -167,6 +167,31 @@ class LandingPageController extends Controller
         }
     }
 
+    public function serviceDetail($id)
+    {
+        $service = Service::with(['includes', 'excludes', 'requirements', 'images', 'variants'])
+            ->where('status', 'active')
+            ->findOrFail($id);
+
+        // Get other services for recommendations (exclude current service)
+        $otherServices = Service::with(['images'])
+            ->where('status', 'active')
+            ->where('id', '!=', $id)
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        $viewData = [
+            'title' => 'Detail ' . $service->title,
+            'sectionTitle' => 'Detail Layanan',
+            'activePage' => 'Layanan',
+            'service' => $service,
+            'otherServices' => $otherServices,
+        ];
+
+        return view('services.detail', $viewData);
+    }
+
     /**
      * Display galleries page with dynamic data
      */
@@ -451,8 +476,8 @@ class LandingPageController extends Controller
             // Load service relationship
             $order->load('service');
 
-            // Send Gmail notification to admin
-            $this->sendOrderNotificationToAdmin($order);
+            // Note: Email notification disabled as requested
+            // $this->sendOrderNotificationToAdmin($order);
 
             return response()->json([
                 'success' => true,

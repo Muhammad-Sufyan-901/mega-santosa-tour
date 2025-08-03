@@ -27,6 +27,7 @@
             <!-- Modal body -->
             <div class="p-4 md:p-5">
                 <form id="booking-form" class="space-y-4">
+                    <input type="hidden" name="service-id" id="service-id" value="">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="full-name" class="block mb-2 text-sm font-medium text-gray-900">Nama
@@ -69,37 +70,22 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 required>
                                 <option value="" disabled selected>Pilih jenis layanan</option>
+                                @php
+                                    $services = \App\Models\Service::where('status', 'active')->get();
+                                @endphp
                                 <optgroup label="Sewa Mobil">
-                                    @if (isset($carRentals) && count($carRentals) > 0)
-                                        @foreach ($carRentals as $car)
-                                            <option value="{{ $car->id }}" data-type="car"
-                                                data-price="{{ $car->price }}">{{ $car->name }} - Rp
-                                                {{ number_format($car->price, 0, ',', '.') }}/hari</option>
-                                        @endforeach
-                                    @else
-                                        <option value="innova" data-type="car" data-price="2000000">Innova Reborn - Rp
-                                            2.000.000/hari</option>
-                                        <option value="avanza" data-type="car" data-price="1500000">Avanza - Rp
-                                            1.500.000/hari</option>
-                                        <option value="jeep" data-type="car" data-price="1000000">Jeep - Rp
-                                            1.000.000/hari</option>
-                                    @endif
+                                    @foreach ($services->where('type_of_service', 'Sewa Mobil') as $service)
+                                        <option value="{{ $service->id }}" data-type="car"
+                                            data-price="{{ $service->price }}">{{ $service->title }} - Rp
+                                            {{ number_format($service->price, 0, ',', '.') }}/hari</option>
+                                    @endforeach
                                 </optgroup>
                                 <optgroup label="Paket Tour">
-                                    @if (isset($tourPackages) && count($tourPackages) > 0)
-                                        @foreach ($tourPackages as $tour)
-                                            <option value="{{ $tour->id }}" data-type="tour"
-                                                data-price="{{ $tour->price }}">{{ $tour->name }} - Rp
-                                                {{ number_format($tour->price, 0, ',', '.') }}/hari</option>
-                                        @endforeach
-                                    @else
-                                        <option value="bali-tour" data-type="tour" data-price="3000000">Bali Tour - Rp
-                                            3.000.000/hari</option>
-                                        <option value="bromo-tour" data-type="tour" data-price="2500000">Bromo Tour - Rp
-                                            2.500.000/hari</option>
-                                        <option value="city-tour" data-type="tour" data-price="1800000">City Tour - Rp
-                                            1.800.000/hari</option>
-                                    @endif
+                                    @foreach ($services->where('type_of_service', 'Paket Tour') as $service)
+                                        <option value="{{ $service->id }}" data-type="tour"
+                                            data-price="{{ $service->price }}">{{ $service->title }} - Rp
+                                            {{ number_format($service->price, 0, ',', '.') }}/hari</option>
+                                    @endforeach
                                 </optgroup>
                             </select>
                         </div>
@@ -148,7 +134,7 @@
                         Konfirmasi Pemesanan
                     </h3>
 
-                    <p class="text-sm text-gray-500">Mohon diperiksa kembali sebelum melakukan pembayaran. Pastikan
+                    <p class="text-sm text-gray-500">Mohon diperiksa kembali sebelum melakukan pemesanan. Pastikan
                         semua informasi sudah benar.</p>
                 </div>
                 <button type="button"
@@ -216,7 +202,7 @@
                         </button>
                         <button id="confirm-button" type="button"
                             class="w-1/2 text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            <i class="fa-brands fa-whatsapp mr-2"></i> Konfirmasi via WhatsApp
+                            <i class="fas fa-check mr-2"></i> Konfirmasi Pesanan
                         </button>
                     </div>
                 </div>
@@ -225,8 +211,52 @@
     </div>
 </div>
 
+<!-- Success Modal -->
+<div id="booking-success-modal" tabindex="-1" aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow border border-gray-200">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 rounded-t">
+                <h3 class="text-xl font-bold text-gray-900">
+                    Pesanan Berhasil Dibuat!
+                </h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                    data-modal-hide="booking-success-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Tutup modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5 text-center">
+                <div class="w-12 h-12 rounded-full bg-green-100 p-2 flex items-center justify-center mx-auto mb-3.5">
+                    <i class="fas fa-check text-green-500 text-xl"></i>
+                </div>
+                <p class="mb-4 text-lg font-semibold text-gray-900">Terima kasih!</p>
+                <p class="text-gray-500 mb-6">Pesanan Anda telah berhasil dibuat dan akan segera diproses. Admin kami
+                    akan menghubungi Anda melalui WhatsApp dalam waktu 1x24 jam untuk konfirmasi lebih lanjut.</p>
+                <button data-modal-hide="booking-success-modal" type="button"
+                    class="text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Prevent multiple event listener registration
+        if (window.bookingModalInitialized) {
+            return;
+        }
+        window.bookingModalInitialized = true;
         // Get form elements
         const bookingForm = document.getElementById('booking-form');
         const serviceTypeSelect = document.getElementById('service-type');
@@ -261,45 +291,60 @@
 
                 // Get form data
                 const formData = new FormData(bookingForm);
+                const serviceTypeSelect = document.getElementById('service-type');
+                const selectedServiceId = serviceTypeSelect.value || formData.get('service-id') || getServiceIdFromPage();
+                
                 const bookingData = {
-                    fullName: formData.get('full-name'),
+                    service_id: selectedServiceId,
+                    name: formData.get('full-name'),
                     email: formData.get('email'),
-                    whatsapp: formData.get('whatsapp'),
-                    participants: formData.get('participants'),
-                    pickupLocation: formData.get('pickup-location'),
-                    startDate: formData.get('start-date'),
-                    endDate: formData.get('end-date'),
-                    serviceType: formData.get('service-type'),
-                    message: formData.get('message')
+                    whatsapp_number: formData.get('whatsapp'),
+                    number_of_participants: parseInt(formData.get('participants')),
+                    pickup_location: formData.get('pickup-location'),
+                    start_date: formData.get('start-date'),
+                    end_date: formData.get('end-date'),
+                    message: formData.get('message') || ''
                 };
 
+                // Validate required fields
+                if (!bookingData.service_id || !bookingData.name || !bookingData.email ||
+                    !bookingData.whatsapp_number || !bookingData.pickup_location ||
+                    !bookingData.start_date || !bookingData.end_date) {
+                    alert('Mohon lengkapi semua field yang wajib diisi.');
+                    return;
+                }
+
                 // Calculate number of days
-                const start = new Date(bookingData.startDate);
-                const end = new Date(bookingData.endDate);
+                const start = new Date(bookingData.start_date);
+                const end = new Date(bookingData.end_date);
                 const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
 
                 // Get base price from selected service
                 const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
-                const basePrice = parseInt(selectedOption.dataset.price) ||
-                    1000000; // Default price if not set
+                const basePrice = parseInt(selectedOption?.dataset?.price) || 1000000;
+                const serviceName = selectedOption?.textContent || 'Layanan';
 
                 // Calculate total price (base price * days * participants)
-                const totalPrice = basePrice * days * parseInt(bookingData.participants);
+                const totalPrice = basePrice * days * parseInt(bookingData.number_of_participants);
 
                 // Update confirmation modal with booking details
-                document.getElementById('confirm-full-name').textContent = bookingData.fullName;
+                document.getElementById('confirm-full-name').textContent = bookingData.name;
                 document.getElementById('confirm-email').textContent = bookingData.email;
-                document.getElementById('confirm-whatsapp').textContent = bookingData.whatsapp;
-                document.getElementById('confirm-participants').textContent = bookingData.participants;
-                document.getElementById('confirm-pickup').textContent = bookingData.pickupLocation;
+                document.getElementById('confirm-whatsapp').textContent = bookingData.whatsapp_number;
+                document.getElementById('confirm-participants').textContent = bookingData
+                    .number_of_participants;
+                document.getElementById('confirm-pickup').textContent = bookingData.pickup_location;
                 document.getElementById('confirm-dates').textContent =
-                    `${bookingData.startDate} - ${bookingData.endDate} (${days} hari)`;
-                document.getElementById('confirm-service').textContent = selectedOption.textContent;
+                    `${bookingData.start_date} - ${bookingData.end_date} (${days} hari)`;
+                document.getElementById('confirm-service').textContent = serviceName;
                 document.getElementById('confirm-message').textContent = bookingData.message || '-';
                 document.getElementById('confirm-total-price').textContent =
                     `Rp ${totalPrice.toLocaleString('id-ID')}`;
 
-                // Hide booking modal and show confirmation modal using data attributes
+                // Store booking data for later submission
+                window.currentBookingData = bookingData;
+
+                // Hide booking modal and show confirmation modal
                 hideModal('booking-modal');
                 showModal('confirmation-modal');
             });
@@ -314,39 +359,62 @@
             });
         }
 
-        // Handle WhatsApp confirmation button
+        // Handle confirmation button click
         if (confirmButton) {
             confirmButton.addEventListener('click', function() {
-                // Get booking details
-                const fullName = document.getElementById('confirm-full-name').textContent;
-                const email = document.getElementById('confirm-email').textContent;
-                const whatsapp = document.getElementById('confirm-whatsapp').textContent;
-                const participants = document.getElementById('confirm-participants').textContent;
-                const pickup = document.getElementById('confirm-pickup').textContent;
-                const dates = document.getElementById('confirm-dates').textContent;
-                const service = document.getElementById('confirm-service').textContent;
-                const message = document.getElementById('confirm-message').textContent;
-                const totalPrice = document.getElementById('confirm-total-price').textContent;
+                const bookingData = window.currentBookingData;
 
-                // Create WhatsApp message
-                const whatsappMessage = `*BOOKING MEGA SANTOSA TOUR*%0A%0A` +
-                    `*Nama:* ${fullName}%0A` +
-                    `*Email:* ${email}%0A` +
-                    `*WhatsApp:* ${whatsapp}%0A` +
-                    `*Jumlah Peserta:* ${participants}%0A` +
-                    `*Lokasi Pickup:* ${pickup}%0A` +
-                    `*Tanggal:* ${dates}%0A` +
-                    `*Layanan:* ${service}%0A` +
-                    `*Pesan:* ${message}%0A` +
-                    `*Total Harga:* ${totalPrice}%0A%0A` +
-                    `Mohon konfirmasi pemesanan saya. Terima kasih!`;
+                if (!bookingData) {
+                    alert('Data booking tidak ditemukan. Silakan coba lagi.');
+                    return;
+                }
 
-                // Open WhatsApp with pre-filled message
-                // Replace the phone number with your business WhatsApp number
-                window.open(`https://wa.me/628123456789?text=${whatsappMessage}`, '_blank');
+                // Prevent multiple submissions
+                if (window.bookingSubmitting) {
+                    return;
+                }
+                window.bookingSubmitting = true;
 
-                // Close the modal after opening WhatsApp
-                hideModal('confirmation-modal');
+                // Disable button to prevent double submission
+                confirmButton.disabled = true;
+                confirmButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+
+                // Submit order to API
+                fetch('/api/public/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify(bookingData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Hide confirmation modal and show success modal
+                            hideModal('confirmation-modal');
+                            showModal('booking-success-modal');
+
+                            // Reset form and clear data
+                            bookingForm.reset();
+                            window.currentBookingData = null;
+                        } else {
+                            throw new Error(data.message ||
+                                'Terjadi kesalahan saat membuat pesanan.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan: ' + error.message);
+                    })
+                    .finally(() => {
+                        // Re-enable button and reset submission flag
+                        confirmButton.disabled = false;
+                        confirmButton.innerHTML =
+                            '<i class="fas fa-check mr-2"></i> Konfirmasi Pesanan';
+                        window.bookingSubmitting = false;
+                    });
             });
         }
 
@@ -369,21 +437,54 @@
             }
         }
 
-        // Pre-select service type if coming from detail page
-        if (window.location.pathname.includes('/detail')) {
-            // Try to get service info from the page
-            const serviceName = document.querySelector('h1.text-5xl')?.textContent.trim();
-
-            if (serviceName && serviceTypeSelect) {
-                // Find and select the option that matches the service name
+        // Pre-select service type if coming from detail page or if service ID is provided
+        function preSelectService() {
+            if (!serviceTypeSelect) return;
+            
+            // Try to get service ID from various sources
+            let serviceId = null;
+            
+            // 1. From button data attribute
+            const bookingButton = document.querySelector('[data-modal-target="booking-modal"]');
+            if (bookingButton && bookingButton.dataset.serviceId) {
+                serviceId = bookingButton.dataset.serviceId;
+            }
+            
+            // 2. From URL if on detail page
+            if (!serviceId && window.location.pathname.includes('/detail')) {
+                const pathParts = window.location.pathname.split('/');
+                const serviceIndex = pathParts.indexOf('services');
+                if (serviceIndex !== -1 && pathParts[serviceIndex + 1]) {
+                    serviceId = pathParts[serviceIndex + 1];
+                }
+            }
+            
+            // 3. Try to match by service name from page title
+            if (!serviceId && window.location.pathname.includes('/detail')) {
+                const serviceName = document.querySelector('h1.text-5xl')?.textContent.trim();
+                if (serviceName) {
+                    for (let i = 0; i < serviceTypeSelect.options.length; i++) {
+                        if (serviceTypeSelect.options[i].textContent.includes(serviceName)) {
+                            serviceTypeSelect.selectedIndex = i;
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Select by service ID
+            if (serviceId) {
                 for (let i = 0; i < serviceTypeSelect.options.length; i++) {
-                    if (serviceTypeSelect.options[i].textContent.includes(serviceName)) {
+                    if (serviceTypeSelect.options[i].value === serviceId) {
                         serviceTypeSelect.selectedIndex = i;
                         break;
                     }
                 }
             }
         }
+        
+        // Call pre-select function
+        preSelectService();
 
         // Handle modal close buttons
         document.querySelectorAll('[data-modal-hide]').forEach(button => {
@@ -402,4 +503,22 @@
             });
         });
     });
+
+    // Helper function to get service ID from page
+    function getServiceIdFromPage() {
+        // Try to get from button data attribute
+        const bookingButton = document.querySelector('[data-modal-target="booking-modal"]');
+        if (bookingButton && bookingButton.dataset.serviceId) {
+            return bookingButton.dataset.serviceId;
+        }
+
+        // Try to get from URL if on detail page
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.includes('services') && pathParts.includes('detail')) {
+            const serviceIndex = pathParts.indexOf('services');
+            return pathParts[serviceIndex + 1];
+        }
+
+        return null;
+    }
 </script>

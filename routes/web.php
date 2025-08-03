@@ -22,7 +22,7 @@ Route::prefix('api/landing')->name('api.landing.')->group(function () {
 
 Route::get('/services', [LandingPageController::class, 'servicesIndex'])->name('services.index');
 
-Route::get('/services/{id}/detail', [ServiceController::class, 'publicDetail'])->name('services.detail');
+Route::get('/services/{id}/detail', [LandingPageController::class, 'serviceDetail'])->name('services.detail');
 
 Route::get('/galleries', [LandingPageController::class, 'galleriesIndex'])->name('galleries.index');
 
