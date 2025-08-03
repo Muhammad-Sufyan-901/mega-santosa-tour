@@ -160,7 +160,9 @@
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                     Deskripsi Jumbotron <span class="text-red-500">*</span>
                                 </label>
-                                <textarea name="jumbotron_description" id="jumbotron_description" required>{{ old('jumbotron_description', $content->jumbotron_description ?? '') }}</textarea>
+                                <textarea rows="5"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                                    name="jumbotron_description" id="jumbotron_description" required>{{ old('jumbotron_description', $content->jumbotron_description ?? '') }}</textarea>
                             </div>
 
                             <!-- Jumbotron Image -->
@@ -261,7 +263,8 @@
                         <p class="text-sm text-gray-500 dark:text-gray-400">Kelola konten section tentang kami</p>
                     </div>
 
-                    <form action="{{ route('admin.content.update.about') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.content.update.about') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -862,35 +865,35 @@
             };
 
             // Initialize all Summernote textareas
-            $('#jumbotron_description').summernote({
-                ...summernoteConfig,
-                placeholder: 'Masukkan deskripsi jumbotron...'
-            });
+            // $('#jumbotron_description').summernote({
+            //     ...summernoteConfig,
+            //     placeholder: 'Masukkan deskripsi jumbotron...'
+            // });
 
-            $('#service_section_description').summernote({
-                ...summernoteConfig,
-                placeholder: 'Masukkan deskripsi section services...'
-            });
+            // $('#service_section_description').summernote({
+            //     ...summernoteConfig,
+            //     placeholder: 'Masukkan deskripsi section services...'
+            // });
 
             $('#about_section_text').summernote({
                 ...summernoteConfig,
                 placeholder: 'Masukkan teks section about...'
             });
 
-            $('#testimonial_description').summernote({
-                ...summernoteConfig,
-                placeholder: 'Masukkan deskripsi section testimonials...'
-            });
+            // $('#testimonial_description').summernote({
+            //     ...summernoteConfig,
+            //     placeholder: 'Masukkan deskripsi section testimonials...'
+            // });
 
-            $('#gallery_section_description').summernote({
-                ...summernoteConfig,
-                placeholder: 'Masukkan deskripsi section gallery...'
-            });
+            // $('#gallery_section_description').summernote({
+            //     ...summernoteConfig,
+            //     placeholder: 'Masukkan deskripsi section gallery...'
+            // });
 
-            $('#contact_section_description').summernote({
-                ...summernoteConfig,
-                placeholder: 'Masukkan deskripsi section contact...'
-            });
+            // $('#contact_section_description').summernote({
+            //     ...summernoteConfig,
+            //     placeholder: 'Masukkan deskripsi section contact...'
+            // });
         }
 
         // Function to apply dark theme to Summernote
