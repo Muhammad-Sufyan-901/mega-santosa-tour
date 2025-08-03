@@ -219,6 +219,7 @@
         // Handle form submission
         if (testimonialForm) {
             testimonialForm.addEventListener('submit', function(e) {
+                console.log('Form submit event triggered');
                 e.preventDefault();
 
                 // Get form data
@@ -230,17 +231,39 @@
                     message: formData.get('message')
                 };
 
-                // Validate rating
+                console.log('Form data collected:', testimonialData);
+
+                // Validate all required fields
+                if (!testimonialData.name) {
+                    alert('Silakan masukkan nama lengkap');
+                    return;
+                }
+                
+                if (!testimonialData.service) {
+                    alert('Silakan pilih jenis layanan');
+                    return;
+                }
+
                 if (!testimonialData.rating) {
                     alert('Silakan pilih rating terlebih dahulu');
                     return;
                 }
+
+                if (!testimonialData.message) {
+                    alert('Silakan masukkan pesan testimoni');
+                    return;
+                }
+
+                console.log('All validations passed, preparing to submit');
 
                 // Prevent multiple submissions
                 if (window.testimonialSubmitting) {
                     return;
                 }
                 window.testimonialSubmitting = true;
+
+                // Debug log before submission
+                console.log('Submitting testimonial data:', testimonialData);
 
                 // Submit testimonial to API
                 fetch('/api/public/testimonials', {
@@ -252,8 +275,12 @@
                         },
                         body: JSON.stringify(testimonialData)
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Response data:', data);
                         if (data.success) {
                             // Hide testimonial modal and show success modal
                             hideModal('testimonial-modal');
