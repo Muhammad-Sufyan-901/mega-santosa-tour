@@ -333,6 +333,7 @@ class LandingPageController extends Controller
                 'whatsapp' => $contentRow->whatsapp ?? '+62 812-3456-7890',
                 'instagram' => $contentRow->instagram ?? '@megasantosatour',
                 'email' => $contentRow->email ?? 'info@megasantosatour.com',
+                'tiktok' => $contentRow->tiktok ?? '@megasantosatour',
                 'google_maps' => $contentRow->google_maps ?? 'https://maps.google.com/maps?width=1024&amp;height=400&amp;hl=en&amp;q=Jalan%20Gunung%20Andakasa%20+(Mega%20Santosa%20Tour)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed',
                 'address' => $contentRow->address ?? 'Jl. Alamat Kantor Pusat',
                 'logo' => $contentRow->logo ?? null,
@@ -381,6 +382,9 @@ class LandingPageController extends Controller
             'instagram' => $content['instagram'] ?? '@megasantosatour',
             'email' => $content['email'] ?? 'info@megasantosatour.com',
             'address' => $content['address'] ?? 'Jl. Alamat Kantor Pusat',
+            'tiktok' => $content['tiktok'] ?? '@megasantosatour',
+            'facebook' => $content['facebook'] ?? 'https://www.facebook.com/megasantosatour',
+            'youtube' => $content['youtube'] ?? 'https://www.youtube.com/channel/megasantosatour',
             'map_embed' => html_entity_decode($content['google_maps'] ?? 'https://maps.google.com/maps?width=1024&amp;height=400&amp;hl=en&amp;q=Jalan%20Gunung%20Andakasa%20+(Mega%20Santosa%20Tour)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed'),
         ];
     }

@@ -212,6 +212,7 @@ class ContentController extends Controller
             'contact_section_description' => 'nullable|string',
             'whatsapp' => 'nullable|string|max:255',
             'instagram' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'google_maps' => 'nullable|url',
             'address' => 'nullable|string'
@@ -230,6 +231,7 @@ class ContentController extends Controller
             $content->contact_section_description = $request->contact_section_description;
             $content->whatsapp = $request->whatsapp;
             $content->instagram = $request->instagram;
+            $content->tiktok = $request->tiktok;
             $content->email = $request->email;
             $content->google_maps = $request->google_maps;
             $content->address = $request->address;
@@ -370,6 +372,7 @@ class ContentController extends Controller
                         'description' => $content->contact_section_description,
                         'whatsapp' => $content->whatsapp,
                         'instagram' => $content->instagram,
+                        'tiktok' => $content->tiktok,
                         'email' => $content->email,
                         'google_maps' => $content->google_maps
                     ],
