@@ -451,7 +451,7 @@
         </div>
 
         <!-- Contact Methods -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <!-- WhatsApp -->
             <div class="bg-white rounded-lg shadow-md p-6 text-center">
                 <div class="flex justify-center mb-4">
@@ -492,6 +492,28 @@
                     </svg>
                 </a>
             </div>
+
+            <!-- TikTok -->
+            @if (isset($contactData['tiktok']) && !empty($contactData['tiktok']))
+                <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center">
+                            <i class="fab fa-tiktok text-white text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">TikTok</h3>
+                    <p class="text-gray-600 mb-4">{{ $contactData['tiktok'] }}</p>
+                    <a href="{{ 'https://www.tiktok.com/@' . $contactData['tiktok'] }}" target="_blank"
+                        class="w-full text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center">
+                        Hubungi
+                        <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M1 5h12m0 0L9 1m4 4L9 9" />
+                        </svg>
+                    </a>
+                </div>
+            @endif
 
             <!-- Email -->
             <div class="bg-white rounded-lg shadow-md p-6 text-center">
