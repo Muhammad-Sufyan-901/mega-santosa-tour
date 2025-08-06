@@ -148,6 +148,7 @@ class LandingPageController extends Controller
                 'testimonials' => $testimonials,
                 'testimonialSlides' => $testimonialSlides,
                 'sectionTitle' => $content['service_section_title'] ?? 'Layanan Kami',
+                'contactData' => $this->getContactData($content),
             ];
 
             return view('services.index', $viewData);
@@ -208,6 +209,7 @@ class LandingPageController extends Controller
             'displayTitle' => $displayTitle,
             'displayPrice' => $displayPrice,
             'otherServices' => $otherServices,
+            'contactData' => $this->getDefaultContactData(),
         ];
 
         return view('services.detail', $viewData);
@@ -245,6 +247,7 @@ class LandingPageController extends Controller
                 'galleryImages' => $galleryImages,
                 'sectionTitle' => $content['gallery_section_title'] ?? 'Galeri Kami',
                 'testimonialSlides' => $testimonialSlides,
+                'contactData' => $this->getContactData($content),
             ];
 
             return view('galleries.index', $viewData);
