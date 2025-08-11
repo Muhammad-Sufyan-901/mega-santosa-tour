@@ -138,6 +138,9 @@ class LandingPageController extends Controller
             // Group testimonials into slides of 3
             $testimonialSlides = $testimonials->chunk(3);
 
+            // Get contact data
+            $contactData = $this->getContactData($content);
+
             // Prepare view data
             $viewData = [
                 'title' => 'Layanan Kami - ' . ($content['site_title'] ?? 'Mega Santosa Tour'),
@@ -148,7 +151,7 @@ class LandingPageController extends Controller
                 'testimonials' => $testimonials,
                 'testimonialSlides' => $testimonialSlides,
                 'sectionTitle' => $content['service_section_title'] ?? 'Layanan Kami',
-                'contactData' => $this->getContactData($content),
+                'contactData' => $contactData,
             ];
 
             return view('services.index', $viewData);
@@ -200,6 +203,9 @@ class LandingPageController extends Controller
             ->limit(6)
             ->get();
 
+        $content = $this->getContentData();
+        $contactData = $this->getContactData($content);
+
         $viewData = [
             'title' => 'Detail ' . $displayTitle,
             'sectionTitle' => 'Detail Layanan',
@@ -209,7 +215,7 @@ class LandingPageController extends Controller
             'displayTitle' => $displayTitle,
             'displayPrice' => $displayPrice,
             'otherServices' => $otherServices,
-            'contactData' => $this->getDefaultContactData(),
+            'contactData' => $contactData,
         ];
 
         return view('services.detail', $viewData);
@@ -239,6 +245,7 @@ class LandingPageController extends Controller
             // Group testimonials into slides of 3
             $testimonialSlides = $testimonials->chunk(3);
 
+            $contactData = $this->getContactData($content);
             // Prepare view data
             $viewData = [
                 'title' => ($content['gallery_section_title'] ?? 'Galeri Kami') . ' - ' . ($content['site_title'] ?? 'Mega Santosa Tour'),
@@ -247,7 +254,7 @@ class LandingPageController extends Controller
                 'galleryImages' => $galleryImages,
                 'sectionTitle' => $content['gallery_section_title'] ?? 'Galeri Kami',
                 'testimonialSlides' => $testimonialSlides,
-                'contactData' => $this->getContactData($content),
+                'contactData' => $contactData,
             ];
 
             return view('galleries.index', $viewData);
