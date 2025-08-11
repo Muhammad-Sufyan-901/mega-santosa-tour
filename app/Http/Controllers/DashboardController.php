@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -15,6 +16,11 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        // Set initial last check time when dashboard is first loaded
+        if (!session()->has('last_order_check')) {
+            session(['last_order_check' => Carbon::now()->toISOString()]);
+        }
+
         $viewData = [
             'title' => 'Dashboard',
             'activePage' => 'Dashboard',
@@ -25,9 +31,122 @@ class DashboardController extends Controller
             'statusStats' => $this->getStatusStatistics(),
             'serviceTypeStats' => $this->getServiceTypeStatistics(),
             'weeklyComparison' => $this->getWeeklyComparison(),
+            'lastOrderCheck' => session('last_order_check'),
         ];
 
         return view('admin.dashboard.index', $viewData);
+    }
+
+    /**
+     * Check for new orders since last check
+     */
+    public function checkNewOrders(Request $request)
+    {
+        try {
+            $lastCheck = $request->input('last_check');
+            
+            // If no last_check provided, use session or default to 5 minutes ago
+            if (!$lastCheck) {
+                $lastCheck = session('last_order_check', Carbon::now()->subMinutes(5)->toISOString());
+            }
+            
+            $lastCheckTime = Carbon::parse($lastCheck);
+            $currentTime = Carbon::now();
+            
+            Log::info('Checking for new orders', [
+                'last_check' => $lastCheckTime->toISOString(),
+                'current_time' => $currentTime->toISOString()
+            ]);
+            
+            $newOrders = Order::with('service')
+                ->where('created_at', '>', $lastCheckTime)
+                ->latest()
+                ->get();
+                
+            Log::info('Found orders', [
+                'count' => $newOrders->count(),
+                'orders' => $newOrders->pluck('id')->toArray()
+            ]);
+            
+            $formattedOrders = $newOrders->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'customer_name' => $order->name,
+                    'service_title' => $order->service->title ?? 'Layanan Tidak Ditemukan',
+                    'service_type' => $order->service->type_of_service ?? 'Unknown',
+                    'amount' => $order->service ? ($order->service->price * $this->calculateDuration($order->start_date, $order->end_date) * $order->number_of_participants) : 0,
+                    'formatted_amount' => 'Rp ' . number_format($order->service ? ($order->service->price * $this->calculateDuration($order->start_date, $order->end_date) * $order->number_of_participants) : 0, 0, ',', '.'),
+                    'status' => $order->status,
+                    'status_text' => $this->getStatusText($order->status),
+                    'order_number' => 'MST' . str_pad($order->id, 3, '0', STR_PAD_LEFT),
+                    'created_at' => $order->created_at->toISOString(),
+                    'formatted_date' => $order->created_at->format('d M Y H:i'),
+                    'time_ago' => $order->created_at->diffForHumans(),
+                ];
+            });
+
+            // Update session with current time for next check
+            session(['last_order_check' => $currentTime->toISOString()]);
+
+            return response()->json([
+                'success' => true,
+                'new_orders' => $formattedOrders,
+                'count' => $formattedOrders->count(),
+                'current_time' => $currentTime->toISOString(),
+                'last_check_time' => $lastCheckTime->toISOString()
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error checking for new orders: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'new_orders' => [],
+                'count' => 0,
+                'current_time' => Carbon::now()->toISOString()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get recent notifications for layout
+     */
+    public function getNotifications()
+    {
+        $notifications = Order::with('service')
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'title' => 'Pesanan Baru #' . 'MST' . str_pad($order->id, 3, '0', STR_PAD_LEFT),
+                    'message' => $order->name . ' memesan ' . ($order->service->title ?? 'Layanan'),
+                    'time_ago' => $order->created_at->diffForHumans(),
+                    'created_at' => $order->created_at->toISOString(),
+                    'type' => 'order',
+                    'icon' => $order->service && $order->service->type_of_service === 'Sewa Mobil' ? 'car' : 'tour',
+                    'url' => route('admin.orders.index'),
+                ];
+            });
+
+        return response()->json($notifications);
+    }
+
+    /**
+     * Reset last order check time (for testing purposes)
+     */
+    public function resetOrderCheck()
+    {
+        session()->forget('last_order_check');
+        session(['last_order_check' => Carbon::now()->subHours(1)->toISOString()]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Order check time reset',
+            'last_check' => session('last_order_check')
+        ]);
     }
 
     /**

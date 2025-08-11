@@ -237,6 +237,57 @@
         </div>
     </div>
 
+    <!-- New Order Notification Modal -->
+    <div id="newOrderModal" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 rounded-t dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                        Pesanan Baru Masuk!
+                    </h3>
+                    <button type="button" id="closeModal"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Tutup modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 text-center">
+                    <div class="w-12 h-12 rounded-full bg-green-100 p-2 flex items-center justify-center mx-auto mb-3.5 dark:bg-green-900">
+                        <svg class="w-6 h-6 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="mb-4 text-lg font-semibold text-gray-900 dark:text-white" id="modal-title-count">Pesanan baru telah masuk!</p>
+                    <div id="newOrderDetails" class="text-gray-500 mb-6 text-sm dark:text-gray-400">
+                        <!-- Order details will be populated here -->
+                    </div>
+                    <div class="flex gap-3 justify-center">
+                        <a href="{{ route('admin.orders.index') }}" 
+                            class="text-white bg-gradient-to-r from-[#48A0CB] to-[#1B5DB9] hover:from-blue-900 hover:to-[#3f87ed] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            Lihat Pesanan
+                        </a>
+                        <button type="button" id="closeModalSecondary"
+                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('js')
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script>
@@ -323,6 +374,192 @@
                 const chart = new ApexCharts(document.getElementById("main-chart"), options);
                 chart.render();
             }
+
+            // New Order Notification System
+            let lastOrderCheck = @json($lastOrderCheck);
+            let checkInterval;
+
+            function playNotificationSound() {
+                // Create notification sound
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEcBjiS1/7MeSsFJH');
+                audio.volume = 0.3;
+                audio.play().catch(e => console.log('Could not play sound:', e));
+            }
+
+            function checkForNewOrders() {
+                console.log('Checking for new orders...', {
+                    lastOrderCheck: lastOrderCheck,
+                    url: '{{ route('admin.dashboard.check-new-orders') }}'
+                });
+
+                fetch('{{ route('admin.dashboard.check-new-orders') }}?last_check=' + encodeURIComponent(lastOrderCheck), {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    
+                    if (data.success && data.count > 0) {
+                        console.log('New orders found:', data.count);
+                        showNewOrderModal(data.new_orders);
+                        playNotificationSound();
+                        updateStatistics();
+                        
+                        // Trigger notification dot in the navbar
+                        if (typeof window.triggerNotificationDot === 'function') {
+                            window.triggerNotificationDot();
+                        }
+                    } else {
+                        console.log('No new orders found');
+                    }
+                    
+                    // Update last check time
+                    if (data.current_time) {
+                        lastOrderCheck = data.current_time;
+                        console.log('Updated lastOrderCheck to:', lastOrderCheck);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking for new orders:', error);
+                });
+            }
+
+            function showNewOrderModal(orders) {
+                const modal = document.getElementById('newOrderModal');
+                const detailsContainer = document.getElementById('newOrderDetails');
+                const titleCount = document.getElementById('modal-title-count');
+                
+                // Update title based on order count
+                if (orders.length === 1) {
+                    titleCount.textContent = 'Ada pesanan baru yang masuk!';
+                } else {
+                    titleCount.textContent = `Ada ${orders.length} pesanan baru yang masuk!`;
+                }
+                
+                let ordersHtml = '';
+                orders.forEach((order, index) => {
+                    const serviceTypeIcon = order.service_type === 'Sewa Mobil' ? '🚗' : '🗺️';
+                    const serviceTypeBadge = order.service_type === 'Sewa Mobil' 
+                        ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">🚗 Sewa Mobil</span>'
+                        : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">🗺️ Paket Tour</span>';
+                    
+                    ordersHtml += `
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3 last:mb-0 dark:bg-gray-700">
+                            <div class="text-center">
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                                    ${serviceTypeIcon} Pesanan #${order.order_number}
+                                </h4>
+                                <div class="space-y-1 text-xs text-gray-600 dark:text-gray-300">
+                                    <p><span class="font-medium">Pelanggan:</span> ${order.customer_name}</p>
+                                    <p><span class="font-medium">Layanan:</span> ${order.service_title}</p>
+                                    <p>${serviceTypeBadge}</p>
+                                    <p><span class="font-medium">Total:</span> <span class="text-green-600 dark:text-green-400 font-semibold">${order.formatted_amount}</span></p>
+                                    <p class="text-gray-500 dark:text-gray-400">${order.time_ago}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                detailsContainer.innerHTML = ordersHtml;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function updateStatistics() {
+                // Reload the page to update statistics
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            }
+
+            // Modal close functionality
+            function closeModal() {
+                const modal = document.getElementById('newOrderModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('closeModalSecondary').addEventListener('click', closeModal);
+
+            // Close modal when clicking outside
+            document.getElementById('newOrderModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Start checking for new orders every 10 seconds (for better responsiveness)
+            checkInterval = setInterval(checkForNewOrders, 10000);
+
+            // Check immediately when page loads
+            setTimeout(checkForNewOrders, 2000);
+
+            // Debug functions (only for development)
+            window.debugCheckOrders = function() {
+                console.log('Manual check triggered');
+                checkForNewOrders();
+            };
+
+            window.debugResetCheck = function() {
+                fetch('{{ route('admin.dashboard.reset-order-check') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Reset response:', data);
+                        if (data.success) {
+                            lastOrderCheck = data.last_check;
+                            console.log('Check time reset to:', lastOrderCheck);
+                            alert('Check time reset successfully! Next check will look for orders from 1 hour ago.');
+                        }
+                    })
+                    .catch(error => console.error('Reset error:', error));
+            };
+
+            window.debugShowTestModal = function() {
+                const testOrders = [{
+                    id: 999,
+                    customer_name: 'Test Customer',
+                    service_title: 'Test Service',
+                    service_type: 'Sewa Mobil',
+                    formatted_amount: 'Rp 1.000.000',
+                    order_number: 'MST999',
+                    time_ago: 'just now'
+                }];
+                showNewOrderModal(testOrders);
+                
+                // Also trigger notification dot
+                if (typeof window.triggerNotificationDot === 'function') {
+                    window.triggerNotificationDot();
+                }
+            };
+
+            window.debugTriggerDot = function() {
+                if (typeof window.triggerNotificationDot === 'function') {
+                    window.triggerNotificationDot();
+                    console.log('Notification dot triggered manually');
+                } else {
+                    console.log('triggerNotificationDot function not available');
+                }
+            };
+
+            // Clear interval when page is about to unload
+            window.addEventListener('beforeunload', function() {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                }
+            });
         </script>
     @endpush
 @endsection

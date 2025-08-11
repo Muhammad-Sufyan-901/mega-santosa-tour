@@ -52,6 +52,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     // Dashboard - Updated to use DashboardController
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/dashboard/check-new-orders', [DashboardController::class, 'checkNewOrders'])->name('dashboard.check-new-orders');
+    Route::get('/dashboard/reset-order-check', [DashboardController::class, 'resetOrderCheck'])->name('dashboard.reset-order-check');
+    Route::get('/notifications', [DashboardController::class, 'getNotifications'])->name('notifications');
     // Content Management
     Route::prefix('content')->name('content.')->group(function () {
         // Display content management dashboard

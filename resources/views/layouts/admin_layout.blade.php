@@ -108,7 +108,7 @@
                     </button>
 
                     <button type="button" data-dropdown-toggle="notification-dropdown"
-                        class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+                        class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
                         <span class="sr-only">View notifications</span>
 
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -116,145 +116,27 @@
                                 d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z">
                             </path>
                         </svg>
+                        
+                        <!-- Red dot indicator for new notifications -->
+                        <div id="notification-dot" 
+                             class="hidden absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse">
+                        </div>
                     </button>
 
                     <div class="z-50 hidden max-w-sm my-4 overflow-hidden text-base list-none bg-white divide-y divide-gray-100 rounded shadow-lg dark:divide-gray-600 dark:bg-gray-700"
                         id="notification-dropdown">
                         <div
                             class="block px-4 py-2 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            Notifications
+                            Notifikasi Pesanan
                         </div>
-                        <div>
-                            <a href="#"
-                                class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
-                                <div class="flex-shrink-0">
-                                    <img class="rounded-full w-11 h-11"
-                                        src="https://flowbite-admin-dashboard.vercel.app/images/users/bonnie-green.png"
-                                        alt="Jese image">
-                                    <div
-                                        class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 border border-white rounded-full bg-primary-700 dark:border-gray-700">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z">
-                                            </path>
-                                            <path
-                                                d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z">
-                                            </path>
-                                        </svg>
-                                    </div>
+                        <div id="notifications-container">
+                            <div class="flex px-4 py-3 items-center justify-center">
+                                <div class="text-gray-500 text-sm dark:text-gray-400">
+                                    Memuat notifikasi...
                                 </div>
-                                <div class="w-full pl-3">
-                                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">New
-                                        message from <span class="font-semibold text-gray-900 dark:text-white">Bonnie
-                                            Green</span>: "Hey, what's up? All set for the presentation?"</div>
-                                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">a few
-                                        moments ago</div>
-                                </div>
-                            </a>
-                            <a href="#"
-                                class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
-                                <div class="flex-shrink-0">
-                                    <img class="rounded-full w-11 h-11"
-                                        src="https://flowbite-admin-dashboard.vercel.app/images/users/jese-leos.png"
-                                        alt="Jese image">
-                                    <div
-                                        class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-700">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="w-full pl-3">
-                                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
-                                            class="font-semibold text-gray-900 dark:text-white">Jese leos</span> and
-                                        <span class="font-medium text-gray-900 dark:text-white">5 others</span> started
-                                        following you.
-                                    </div>
-                                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">10 minutes
-                                        ago</div>
-                                </div>
-                            </a>
-                            <a href="#"
-                                class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
-                                <div class="flex-shrink-0">
-                                    <img class="rounded-full w-11 h-11"
-                                        src="https://flowbite-admin-dashboard.vercel.app/images/users/joseph-mcfall.png"
-                                        alt="Joseph image">
-                                    <div
-                                        class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-red-600 border border-white rounded-full dark:border-gray-700">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd"
-                                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                                clip-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="w-full pl-3">
-                                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
-                                            class="font-semibold text-gray-900 dark:text-white">Joseph Mcfall</span>
-                                        and <span class="font-medium text-gray-900 dark:text-white">141 others</span>
-                                        love your story. See it and view more stories.</div>
-                                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">44 minutes
-                                        ago</div>
-                                </div>
-                            </a>
-                            <a href="#"
-                                class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
-                                <div class="flex-shrink-0">
-                                    <img class="rounded-full w-11 h-11"
-                                        src="https://flowbite-admin-dashboard.vercel.app/images/users/leslie-livingston.png"
-                                        alt="Leslie image">
-                                    <div
-                                        class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-green-400 border border-white rounded-full dark:border-gray-700">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd"
-                                                d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z"
-                                                clip-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="w-full pl-3">
-                                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
-                                            class="font-semibold text-gray-900 dark:text-white">Leslie
-                                            Livingston</span> mentioned you in a comment: <span
-                                            class="font-medium text-primary-700 dark:text-primary-500">@bonnie.green</span>
-                                        what do you say?</div>
-                                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">1 hour ago
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex-shrink-0">
-                                    <img class="rounded-full w-11 h-11"
-                                        src="https://flowbite-admin-dashboard.vercel.app/images/users/robert-brown.png"
-                                        alt="Robert image">
-                                    <div
-                                        class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-700">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="w-full pl-3">
-                                    <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
-                                            class="font-semibold text-gray-900 dark:text-white">Robert Brown</span>
-                                        posted a new video: Glassmorphism - learn how to implement the new design trend.
-                                    </div>
-                                    <div class="text-xs font-medium text-primary-700 dark:text-primary-400">3 hours ago
-                                    </div>
-                                </div>
-                            </a>
+                            </div>
                         </div>
-                        <a href="#"
+                        <a href="{{ route('admin.orders.index') }}"
                             class="block py-2 text-base font-normal text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:underline">
                             <div class="inline-flex items-center ">
                                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"
@@ -264,7 +146,7 @@
                                         d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
                                         clip-rule="evenodd"></path>
                                 </svg>
-                                View all
+                                Lihat Semua Pesanan
                             </div>
                         </a>
                     </div>
@@ -593,7 +475,154 @@
     <script src="https://flowbite-admin-dashboard.vercel.app//app.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.2/datepicker.min.js"></script>
 
-    @stack('js')
+    <!-- Notification System Script -->
+    <script>
+    let notificationDot = null;
+    let hasUnseenNotifications = false;
+    
+    // Load notifications when dropdown is clicked
+         document.querySelector('[data-dropdown-toggle="notification-dropdown"]').addEventListener('click', function() {
+        loadNotifications();
+    // Hide dot when notifications are viewed
+    hideNotificationDot();
+    hasUnseenNotifications = false;
+    });
+
+    function showNotificationDot() {
+    if (!notificationDot) {
+    notificationDot = document.getElementById('notification-dot');
+    }
+    if (notificationDot) {
+        notificationDot.classList.remove('hidden');
+    hasUnseenNotifications = true;
+    }
+    }
+
+    function hideNotificationDot() {
+    if (!notificationDot) {
+    notificationDot = document.getElementById('notification-dot');
+    }
+    if (notificationDot) {
+    notificationDot.classList.add('hidden');
+                 hasUnseenNotifications = false;
+    }
+    }
+
+    function checkForNewNotifications() {
+    fetch('{{ route('admin.notifications') }}', {
+    method: 'GET',
+    headers: {
+    'X-Requested-With': 'XMLHttpRequest',
+    'Content-Type': 'application/json',
+    }
+    })
+    .then(response => response.json())
+    .then(notifications => {
+    // Check if there are recent notifications (last 5 minutes)
+                 const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentNotifications = notifications.filter(notification => {
+    const notificationDate = new Date(notification.created_at);
+    return notificationDate > fiveMinutesAgo;
+    });
+
+    if (recentNotifications.length > 0 && !hasUnseenNotifications) {
+    showNotificationDot();
+    }
+    })
+    .catch(error => {
+    console.error('Error checking for new notifications:', error);
+    });
+    }
+
+    function loadNotifications() {
+    const container = document.getElementById('notifications-container');
+    
+    fetch('{{ route('admin.notifications') }}', {
+    method: 'GET',
+    headers: {
+    'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+                 }
+    })
+    .then(response => response.json())
+    .then(notifications => {
+    if (notifications.length === 0) {
+        container.innerHTML = `
+        <div class="flex px-4 py-3 items-center justify-center">
+        <div class="text-gray-500 text-sm dark:text-gray-400">
+        Belum ada notifikasi
+        </div>
+        </div>
+        `;
+            return;
+            }
+
+            let notificationsHtml = '';
+            notifications.forEach(notification => {
+            const iconHtml = notification.icon === 'car' 
+                    ? `<div class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 border border-white rounded-full bg-blue-600 dark:border-gray-700">
+                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                 <path d="M3 4a1 1 0 00-1 1v10a2 2 0 002 2h1.586l.707-.707A2 2 0 008.414 16H15a1 1 0 001-1V9.5l1-4A1 1 0 0016 5h-6.382l-.724-1.447A1 1 0 008 3H3z"/>
+                             </svg>
+                            </div>`
+                         : `<div class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 border border-white rounded-full bg-purple-600 dark:border-gray-700">
+                             <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                             </svg>
+                            </div>`;
+
+                     notificationsHtml += `
+                         <a href="${notification.url}" class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                             <div class="flex-shrink-0">
+                                 <div class="rounded-full w-11 h-11 bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                     <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                     </svg>
+                                 </div>
+                                 ${iconHtml}
+                             </div>
+                             <div class="w-full pl-3">
+                                 <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
+                                     <span class="font-semibold text-gray-900 dark:text-white">${notification.title}</span><br>
+                                     ${notification.message}
+                                 </div>
+                                 <div class="text-xs font-medium text-primary-700 dark:text-primary-400">
+                                     ${notification.time_ago}
+                                 </div>
+                             </div>
+                         </a>
+                     `;
+                 });
+
+                 container.innerHTML = notificationsHtml;
+             })
+             .catch(error => {
+                 console.error('Error loading notifications:', error);
+                 container.innerHTML = `
+                     <div class="flex px-4 py-3 items-center justify-center">
+                         <div class="text-red-500 text-sm dark:text-red-400">
+                             Gagal memuat notifikasi
+                         </div>
+                     </div>
+                 `;
+             });
+         }
+
+         // Load notifications on page load
+         document.addEventListener('DOMContentLoaded', function() {
+             setTimeout(loadNotifications, 1000);
+             // Check for new notifications every 30 seconds
+             setInterval(checkForNewNotifications, 30000);
+             
+             // Global function to trigger notification dot (called from dashboard)
+             window.triggerNotificationDot = function() {
+                 showNotificationDot();
+             };
+         });
+     </script>
+
+     @stack('js')
 </body>
 
 </html>
